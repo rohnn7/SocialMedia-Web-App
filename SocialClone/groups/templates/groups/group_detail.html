@@ -1,0 +1,28 @@
+{% extends "groups/group_base.html" %}
+{% block pregroup %}
+  <h1>{{group.name}}</h1>
+  <h2>Members: {{group.members.count}}</h2>
+
+  <div class="content">
+    <!--if that user is found in group's user (ManyToManyField relation) -->
+    {% if user in group.member.count %}
+      <a href="{% url 'groups:leave' slug=group.slug %} " class="btn btn-lg btn-fill btn-warning"
+      ><span class="glyphicon glyphicon-remove-circle"></span>Leave</a>
+    {% else %}
+    <a href="{% url 'groups:join' slug=group.slug %} " class="btn btn-lg btn-fill btn-warning"
+    ><span class="glyphicon glyphicon-ok-circle"></span>Join</a>
+    {% endif %}
+  </div>
+{% endblock %}
+{% block group_content %}
+  <div class="col-md-8">
+    <!-- groups detail accessing Post through related_name = posts -->
+    {% if group.posts.count == 0 %}
+    <h1>No Post Yet</h1>
+    {% else %}
+     {% for post in group.posts.all %}
+      {% include "posts/_post.html" %}<!-- this will inject the _post.html -->
+     {% endfor %}
+    {% endif %}
+  </div>
+{% endblock %}

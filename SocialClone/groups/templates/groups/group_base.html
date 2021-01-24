@@ -1,0 +1,12 @@
+<!--This is just like base html that we will inject in group template. this will
+inherit from base.html . further it will have three blocks of its own.-->
+{% extends "base.html" %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      {% block pregroup %}{% endblock %}
+      {% block group_content %}{% endblock %}
+      {% block postgroup %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}

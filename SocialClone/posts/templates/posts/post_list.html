@@ -1,0 +1,71 @@
+{% extends "posts/post_base.html" %}
+{% block prepost %}
+  <div class="col-md-12">
+    {% if request.user.is_authenticated %}
+    <div class="card card-with-shadow">
+      <div class="content">
+        <h1 class="title" >Groups You are into: </h1>
+        <ul class="list-unstyled">
+          <!-- user_groups is related_name for manytomantfield, we are accessing
+              this by, in models.py of group we said register = template.library().
+              with this we are able to directly call user_group with get_user_groups, which returns
+              all the objects of particular user(request.user) and gives the user their group -->
+          <!--there is one more method to call get_user_groups-->
+          {% for member_group in user_groups %}
+          <li class="group li">
+            <a href="{% url 'groups:single' slug=member_group.slug %}">{{member_group.group.slug}}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+    <div class="card card-with-shadow">
+      <div class="content">
+        <h1 class="title" >All groups registered: </h1>
+        <ul class="list-unstyled">
+          <!-- with first method i cant get the logic for calling gwt_other_groups
+         with second method is more logical  -->
+          {% for other_group in other_groups %}
+          <li class="group li">
+            <h3><a href="{% url 'groups:single' slug=other_group.slug %}">{{other_group.slug}}</a></h3>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+<div class="col-md-8">
+  <hr><br>
+  {% block post_content %}
+    {% for post in post_list %}
+      {% include 'posts/_post.html' %}
+    {% endfor %}
+  {% endblock %}
+</div>
+<!--
+In posts/post_list
+First, I overrided the get_context_data method of the ListView class to add more
+ datas into the context with the kwargs 'user groups' and 'all_groups'.
+  (which will be injected into the post_list.html template).
+NOTE: I HAVE NOT IMPLEMENTED IT IN CODE, BUT THIS IS THE BETTER METHOD
+# Don't forget to import the model
+from groups.models import Group
+
+class PostList(SelectRelatedMixin,generic.ListView):
+ model = models.Post
+
+ select_related = ('user','group')
+
+ queryset=models.Post.objects.all()
+
+ def get_context_data(self, **kwargs):
+
+     context = super(PostList, self).get_context_data(**kwargs)
+     context['user_groups'] = Group.objects.filter(members__in=[self.request.user]) #this statements says select all object of member which has user in it
+     context['other_group'] = Group.objects.all()
+
+     return context
+-->
